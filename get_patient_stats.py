@@ -21,7 +21,7 @@ import pydicom as dicom
 #plt.rcParams['image.interpolation'] = 'nearest'
 #plt.rcParams['image.cmap'] = 'gray'
 
-# examples are at /netscratch/jxu/jxu3/conf/mic15/binning
+
 os.environ['PYTHONINSPECT'] = '1'
 
 id_tags = {'name' : 0x00100010,
@@ -78,33 +78,7 @@ private_acq_tags = {
           'water_attenuation' : 0x70411001 ,   # string  mm-1
         }
 
-def save_im (recon,  outbase ) :
 
-#  recon = np.where (recon > 0, recon, 0)
-  outname= "%s.dat"  % ( outbase )
-
-  outf = open (outname, 'wb')
-  recon.astype(np.float32).tofile (outf)
-  outf.close ()
-
-  outim= "%s"  % ( outbase )
-  aa = np.squeeze(recon).shape
-  if (len (aa) == 2) :
-    zdim,  xdim= aa
-    ydim = 1
-  else :
-    zdim, ydim,  xdim= aa
-
-  try :
-    os.remove (outim)
-  except FileNotFoundError:
-    pass
-  os.system ('import -r -d {} {} {} {} {}'.format (xdim, ydim, zdim, outname, outim))
-
-  try :
-    os.remove (outname)
-  except FileNotFoundError:
-    pass
 
 def unpack_array (string ) : 
   u = array.array ('f') 
@@ -120,22 +94,11 @@ def unpack_uint (string) :
 
 if (len(argv) < 2):
 	print ("usage: get_patient_stats.py blah" )
-	print ('''
-			-n: [number of total views ] 
-			-s: [slice spacing] 
-			-i: [first view, v0 ] 
-		''' )
 	exit(1)
 
 parser = OptionParser()
-parser.add_option("-n", "--nviews", type = "int", dest="nviews_used", \
-    help="scaling factor to convert to atten 1/cm", default=4000)
-parser.add_option("-i", "--first-view", type = "int", dest="first_view", \
-    help="scaling factor to convert to atten 1/cm", default=0)
-parser.add_option("-s", "--spacing", type = "float", dest="spacing", \
-    help="slice spacing", default=2.)
-parser.add_option("-w", "--water", action = "store_false", dest="conv", \
-    help="convolve with slide width", default=True)
+parser.add_option("-t, "--test", action = "store_false", dest="test", \
+    help="test help mesage", default=True)
 
 (options, args) = parser.parse_args()
 
